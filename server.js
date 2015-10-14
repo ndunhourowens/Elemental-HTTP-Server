@@ -9,6 +9,8 @@ var fs = require('fs');
 // Create a server
 var server = http.createServer(function(request,response){
   var dataBuffer = "";
+  console.log(request);
+
 
   request.on('data', function(dataInFiles){
     dataBuffer += dataInFiles;
@@ -18,8 +20,6 @@ var server = http.createServer(function(request,response){
   request.on('end',function(){
     // read the input from the browser
     var inputFromBrowser = url.parse(request.url);
-    console.log(inputFromBrowser);
-
 
     fs.readFile('./public' + inputFromBrowser.path, function(err, dataInFiles){
         // return the 404.html
