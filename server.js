@@ -99,7 +99,6 @@ if(request.method === 'GET'){
   });
 }
 
-
 // +++++++++++++++++++ end of rendering li to index
 
 
