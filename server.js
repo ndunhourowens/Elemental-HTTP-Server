@@ -38,12 +38,6 @@ if(request.method === 'GET'){
     });
   });
 }else if(request.method === 'POST'){
-// *************  POST request
-  // var eleName = 'eleName';
-  // var eleSymbol = 'eleSymbol';
-  // var eleAtomNum = 'eleAtomNum';
-  // var eleDes = 'eleDes';
-
 
   request.on('data', function(dataFromPost){
     dataBuffer += dataFromPost;
@@ -53,16 +47,63 @@ if(request.method === 'GET'){
     // body...
     var querystring = url.parse(request.url);
     var newElement = qs.parse(dataBuffer.toString() );
-    var element = (
+    var elements = null; // empty array
+    var newElementPage = (
       '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - ' + newElement.eleName + '</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>' + newElement.eleName + '</h1> <h2>' + newElement.eleSymbol + '</h2> <h3>' + newElement.eleAtomNum +'</h3> <p>' + newElement.eleDes + '</p> <p><a href="/">back</a></p> </body> </html>'
     );
-    fs.writeFile( './public/' + newElement.eleName + '.html', element, function(err){
+
+    var newli = ("<li> <a href=" + newPath + ">" + newElement.eleName + "</a> </li> </br>");
+    console.log('new li', newli);
+    var newPath = ('/' + newElement.eleName.toLowerCase() + '.html');
+    // console.log('new path', newPath);
+
+    // printing a new Element from the postman
+    fs.writeFile( './public/' + newElement.eleName.toLowerCase() + '.html', newElementPage, function(err){
       if(err) throw new Error('could not write to testing.html' + err.message);
       console.log('done write to uber.txt');
     });
-  });
+  // +++++++++++++++++++ start of rendering li to index
+    // code a rendering code to insert into the index
 
-}  // end of if statement
+    fs.readdir('./public', function(err, files){
+      if(err) throw new Error('./public dir does not exist or is not readable' + err.message);
+
+      // only want html element files
+      elements = files.filter(function(file){
+        return file.indexOf('.html') > 1 &&
+          file !== '404.html' &&
+          file !== 'index.html';
+      }).map(function(elementFileName){
+        return elementFileName.substr(0, elementFileName.indexOf('.html'));
+      }).map(function(lowerCasedElementName){
+        return lowerCasedElementName.substr(0,1).toUpperCase() + lowerCasedElementName.substr(1);
+      });
+      //elements array is initialized
+      //write our rendered index.html
+      replaceIndex();
+    });
+
+    function replaceIndex(){
+      fs.readFile('./templates/tempIndex.html', function(err, template){
+        if(err) throw new Error('could not write to tempIndex.html' + err.message);
+      });
+      // create the LI in html
+      var createLI = elements.map(function(element){
+        return newli;
+      });
+      var render = template.toString().replace('{{listOfElements}}', createLI.join('\n'));
+
+      fs.writeFile('./public/index.html', render, function(err){
+        if(err) throw new Error('could not write to ./public/index.html', err.message);
+      });
+    }
+  });
+}
+
+
+// +++++++++++++++++++ end of rendering li to index
+
+
 }); // end of var server
 
 
