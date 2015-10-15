@@ -52,11 +52,6 @@ if(request.method === 'GET'){
       '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - ' + newElement.eleName + '</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>' + newElement.eleName + '</h1> <h2>' + newElement.eleSymbol + '</h2> <h3>' + newElement.eleAtomNum +'</h3> <p>' + newElement.eleDes + '</p> <p><a href="/">back</a></p> </body> </html>'
     );
 
-    var newli = ("<li> <a href=" + newPath + ">" + newElement.eleName + "</a> </li> </br>");
-    console.log('new li', newli);
-    var newPath = ('/' + newElement.eleName.toLowerCase() + '.html');
-    // console.log('new path', newPath);
-
     // printing a new Element from the postman
     fs.writeFile( './public/' + newElement.eleName.toLowerCase() + '.html', newElementPage, function(err){
       if(err) throw new Error('could not write to testing.html' + err.message);
@@ -88,7 +83,9 @@ if(request.method === 'GET'){
         if(err) throw new Error('could not write to tempIndex.html' + err.message);
       });
       // create the LI in html
-      var createLI = elements.map(function(element){
+      var createLI = elements.map(function(elementName){
+        var newPath = ('/' + elementName.toLowerCase() + '.html');
+        var newli = ("<li> <a href=" + newPath + ">" + elementName + "</a> </li> </br>");
         return newli;
       });
       var render = template.toString().replace('{{listOfElements}}', createLI.join('\n'));
