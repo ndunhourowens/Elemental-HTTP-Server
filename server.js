@@ -73,7 +73,6 @@ if(request.method === 'GET'){
       }).map(function(lowerCasedElementName){
         return lowerCasedElementName.substr(0,1).toUpperCase() + lowerCasedElementName.substr(1);
       });
-      console.log(elements);
       //elements array is initialized
       //write our rendered index.html
       replaceIndex();
@@ -85,8 +84,8 @@ if(request.method === 'GET'){
 
         // create the LI in html
         var createLI = elements.map(function(elementName){
-          var newPath = ('/' + elementName.toLowerCase() + '.html');
-          var newli = ("<li> <a href=" + newPath + ">" + elementName + "</a> </li> </br>");
+        var newPath = ('/' + elementName.toLowerCase() + '.html');
+        var newli = ("<li> <a href=" + newPath + ">" + elementName + "</a> </li>");
 
           return newli;
         });
@@ -98,7 +97,15 @@ if(request.method === 'GET'){
       });
     }
   });
-}
+}else if(request.method === 'PUT'){
+
+
+
+
+
+
+
+}// End of PUT request
 
 // +++++++++++++++++++ end of rendering li to index
 
