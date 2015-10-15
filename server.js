@@ -14,17 +14,15 @@ var server = http.createServer(function(request,response){
 
 // write a condition to verify a get request
 
-
+if(request.method === 'GET'){
   request.on('data', function(dataInFiles){
     dataBuffer += dataInFiles;
     // var data = qs.parse( dataBuffer.toString() );
   });
-console.log(request);
 
   request.on('end',function(){
     // read the input from the browser
     var inputFromBrowser = url.parse(request.url);
-    console.log('what this qs? \n', qs.parse);
 
     // verify if the GET url request is in the public folder ==> return file
     fs.readFile('./public/' + inputFromBrowser.path, function(err, dataInFiles){
@@ -39,26 +37,34 @@ console.log(request);
         }
     });
   });
-});
-
+}else if(request.method === 'POST'){
 // *************  POST request
-var eleName = 'eleName';
-var eleSymbol = 'eleSymbol';
-var eleAtomNum = 'eleAtomNum';
-var eleDes = 'eleDes';
-
-// var querystring = url.parse( request.url, true);
-
-var element = (
-  '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - ' + eleName + '</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>' + eleName + '</h1> <h2>' + eleSymbol + '</h2> <h3>' + eleAtomNum +'</h3> <p>' + eleDes + '</p> <p><a href="/">back</a></p> </body> </html>'
-);
+  // var eleName = 'eleName';
+  // var eleSymbol = 'eleSymbol';
+  // var eleAtomNum = 'eleAtomNum';
+  // var eleDes = 'eleDes';
 
 
-fs.writeFile( './public/' + eleName + '.html', element, function(err){
-  if(err) throw new Error('could not write to testing.html' + err.message);
-   console.log('done write to uber.txt');
+  request.on('data', function(dataFromPost){
+    dataBuffer += dataFromPost;
+  });
 
-});
+  request.on('end', function() {
+    // body...
+    var querystring = url.parse(request.url);
+    var newElement = qs.parse(dataBuffer.toString() );
+    var element = (
+      '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - ' + newElement.eleName + '</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>' + newElement.eleName + '</h1> <h2>' + newElement.eleSymbol + '</h2> <h3>' + newElement.eleAtomNum +'</h3> <p>' + newElement.eleDes + '</p> <p><a href="/">back</a></p> </body> </html>'
+    );
+    fs.writeFile( './public/' + newElement.eleName + '.html', element, function(err){
+      if(err) throw new Error('could not write to testing.html' + err.message);
+      console.log('done write to uber.txt');
+    });
+  });
+
+}  // end of if statement
+}); // end of var server
+
 
 server.listen(PORT, function(){
 
