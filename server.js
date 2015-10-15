@@ -101,9 +101,7 @@ if(request.method === 'GET'){
 
 // +++++++++++++++++++ end of rendering li to index
 
-
 }); // end of var server
-
 
 server.listen(PORT, function(){
 
