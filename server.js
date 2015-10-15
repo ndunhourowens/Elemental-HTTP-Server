@@ -73,6 +73,7 @@ if(request.method === 'GET'){
       }).map(function(lowerCasedElementName){
         return lowerCasedElementName.substr(0,1).toUpperCase() + lowerCasedElementName.substr(1);
       });
+      console.log(elements);
       //elements array is initialized
       //write our rendered index.html
       replaceIndex();
@@ -81,17 +82,19 @@ if(request.method === 'GET'){
     function replaceIndex(){
       fs.readFile('./templates/tempIndex.html', function(err, template){
         if(err) throw new Error('could not write to tempIndex.html' + err.message);
-      });
-      // create the LI in html
-      var createLI = elements.map(function(elementName){
-        var newPath = ('/' + elementName.toLowerCase() + '.html');
-        var newli = ("<li> <a href=" + newPath + ">" + elementName + "</a> </li> </br>");
-        return newli;
-      });
-      var render = template.toString().replace('{{listOfElements}}', createLI.join('\n'));
 
-      fs.writeFile('./public/index.html', render, function(err){
-        if(err) throw new Error('could not write to ./public/index.html', err.message);
+        // create the LI in html
+        var createLI = elements.map(function(elementName){
+          var newPath = ('/' + elementName.toLowerCase() + '.html');
+          var newli = ("<li> <a href=" + newPath + ">" + elementName + "</a> </li> </br>");
+
+          return newli;
+        });
+        var render = template.toString().replace('{{listOfElements}}', createLI.join('\n'));
+
+        fs.writeFile('./public/index.html', render, function(err){
+          if(err) throw new Error('could not write to ./public/index.html', err.message);
+        });
       });
     }
   });
@@ -100,7 +103,6 @@ if(request.method === 'GET'){
 // +++++++++++++++++++ end of rendering li to index
 
 }); // end of var server
-
 
 server.listen(PORT, function(){
 
