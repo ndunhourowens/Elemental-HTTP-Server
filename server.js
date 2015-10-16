@@ -1,3 +1,15 @@
+/*
+
+Jason and Jon,
+
+  i know my code looks like puke, but i really do have the intention of refactoring this and
+  making it cleaner.  The example of swtich case made a lot of sense, and it made me realize
+  the areas where I can create a global variable that can be used in each method (GET, PUT, etc).
+
+*/
+
+
+
 // require/import the HTTP module
 var http = require('http');
 var PORT = 3000;
@@ -73,6 +85,8 @@ if(request.method === 'GET'){
       }).map(function(lowerCasedElementName){
         return lowerCasedElementName.substr(0,1).toUpperCase() + lowerCasedElementName.substr(1);
       });
+
+      console.log('NEWELEMnt', newElement);
       //elements array is initialized
       //write our rendered index.html
       replaceIndex();
@@ -89,24 +103,70 @@ if(request.method === 'GET'){
 
           return newli;
         });
+
+  // console.log(request);
         var render = template.toString().replace('{{listOfElements}}', createLI.join('\n'));
 
         fs.writeFile('./public/index.html', render, function(err){
           if(err) throw new Error('could not write to ./public/index.html', err.message);
         });
+
       });
     }
   });
 }else if(request.method === 'PUT'){
+  // example http://stackoverflow.com/questions/23330107/what-is-the-format-of-a-http-put-request
+  request.on('data', function(dataFromPost){
+    dataBuffer += dataFromPost;
+  });
 
+  request.on('end', function() {
 
+    var inputFromBrowser = url.parse(request.url);
+    var fileToUpdate = qs.parse(dataBuffer.toString() );
+    var elements = null; // empty array
+    var updatePage = (
+      '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>The Elements - '+ fileToUpdate.eleName + '</title> <link rel="stylesheet" href="/css/styles.css"> </head> <body> <h1>' + fileToUpdate.eleName + '</h1> <h2>' + fileToUpdate.eleSymbol + '</h2> <h3>' + fileToUpdate.eleAtomNum +'</h3> <p>' + fileToUpdate.eleDes + '</p> <p><a href="/">back</a> </p> </body> </html>');
+    var tempFile = './templates/' + fileToUpdate.eleName.toLowerCase() + '.html';
 
+    // create an array to verify user request is in file system
+    fs.readdir('./public', function(err, files){
+      if(err) throw new Error('./public dir does not exist or is not readable' + err.message);
+      // console.log(files);
+      // only want html element files
+      elements = files.filter(function(file){
+        return file.indexOf('.html') > -1 &&
+          file !== '404.html' &&
+          file !== 'index.html';
+      }).map(function(elementFileName){
+        return '/'+elementFileName;
+      });
 
+      // check to see if the `eleName` is in the `elements`
+      // if(elements === inputFromBrowser.path){
 
+        // create the updated file in a temp file
+        fs.writeFile(tempFile, updatePage, function(err){
+          if(err) throw new Error('could not write a temp file' + err.message);
+        });
 
+        // replace the old file with the updated file
 
+        fs.writeFile('./public' + inputFromBrowser.path, updatePage, function(err){
+          if(err) throw new Error('could not write to temp file' + err.message);
+        });
+
+      // }
+          // else return 500 server
+    });
+    // if request path doesnot exist ==> 500server {Content-Type: application/json}
+      // && {"error": "resource /carbon.html does not exist"}
+
+    // if request http PUT request sucess ==> http response code 200 {Content-Type: application/json}
+      // && {"sucess": true}
+
+  });
 }// End of PUT request
-
 // +++++++++++++++++++ end of rendering li to index
 
 }); // end of var server
